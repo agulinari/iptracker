@@ -1,0 +1,17 @@
+version: '2'
+services:
+  app:
+    build: .
+    restart: always
+    container_name: iptrackercontainer
+    ports:
+     - "8080:8080"
+    links:
+     - "db:redis"
+  db:
+    image: "redis:alpine"
+    restart: always
+    container_name: rediscontainer
+    hostname: redis
+    ports:
+     - "6379:6379"
