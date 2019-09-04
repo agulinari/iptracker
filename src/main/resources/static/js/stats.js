@@ -1,5 +1,4 @@
 (function pollmax() {
-    setTimeout(function() {
         $.ajax({
             url: "/api/stats/max",
             type: "GET",
@@ -9,10 +8,9 @@
                 $('#maxdistance').html(json);
             },
             dataType: "json",
-            complete: pollmax,
+            complete: setTimeout(function() {pollmax()}, 5000),
             timeout: 2000
         })
-    }, 5000);
 })();
 
 (function pollmin() {
