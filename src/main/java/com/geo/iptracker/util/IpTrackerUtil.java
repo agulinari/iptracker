@@ -3,16 +3,34 @@ package com.geo.iptracker.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GeoUtil {
+public class IpTrackerUtil {
 
+    /**
+     * Validate ip address
+     * @param ip
+     * @return true if ip is valid, otherwise false
+     */
     public static boolean isValidIP(String ip){
 
+        if (ip == null) {
+            return false;
+        }
         Pattern pattern = Pattern.compile("^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$");
         Matcher matcher = pattern.matcher(ip);
         return matcher.find();
 
     }
 
+    /**
+     * Calculate distance in kms between 2 coordinates
+     * @param lat1 latitude 1
+     * @param lat2 latitude 2
+     * @param lon1 longitude 1
+     * @param lon2 longitude 2
+     * @param el1 height 1
+     * @param el2 height 2
+     * @return disntace in kms
+     */
     public static double distance(double lat1, double lat2, double lon1,
                                   double lon2, double el1, double el2) {
 
@@ -24,7 +42,7 @@ public class GeoUtil {
                 + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
                 * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distance = R * c; //* 1000 convert to meters
+        double distance = R * c;
 
         double height = el1 - el2;
 

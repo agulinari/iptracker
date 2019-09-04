@@ -1,5 +1,7 @@
-package com.geo.iptracker.client.fixer;
+package com.geo.iptracker.client.fixer.impl;
 
+import com.geo.iptracker.client.fixer.ExchangeRates;
+import com.geo.iptracker.client.fixer.FixerClient;
 import com.geo.iptracker.client.ip2country.IpCountry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

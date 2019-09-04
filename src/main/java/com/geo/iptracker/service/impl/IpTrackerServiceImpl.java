@@ -1,4 +1,4 @@
-package com.geo.iptracker.service;
+package com.geo.iptracker.service.impl;
 
 import com.geo.iptracker.client.fixer.ExchangeRates;
 import com.geo.iptracker.client.fixer.FixerClient;
@@ -9,14 +9,17 @@ import com.geo.iptracker.domain.dto.Currency;
 import com.geo.iptracker.domain.dto.Distance;
 import com.geo.iptracker.domain.dto.IpTrackerResponse;
 import com.geo.iptracker.domain.dto.Language;
-import com.geo.iptracker.util.GeoUtil;
+import com.geo.iptracker.service.IpTrackerService;
+import com.geo.iptracker.util.IpTrackerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,7 +69,18 @@ public class IpTrackerServiceImpl implements IpTrackerService {
     }
 
     private List<LocalDateTime> calculateLocalTimes(List<String> timezones) {
-        return timezones.stream().map(tz -> LocalDateTime.now(TimeZone.getTimeZone(tz).toZoneId())).collect(Collectors.toList());
+        return timezones.stream().map(this::getDateTime).collect(Collectors.toList());
+    }
+
+    private LocalDateTime getDateTime(String timezone) {
+        String prefix = timezone.substring(0,3);
+        String offset = timezone.substring(3);
+        if (!offset.isEmpty()) {
+            ZoneOffset zoneOffset = ZoneOffset.of(offset);
+            return LocalDateTime.now(ZoneId.ofOffset(prefix, zoneOffset));
+        } else {
+            return LocalDateTime.now(ZoneOffset.UTC);
+        }
     }
 
     private List<Language> buildLanguages(List<com.geo.iptracker.client.restcountries.Language> languages) {
@@ -93,7 +107,7 @@ public class IpTrackerServiceImpl implements IpTrackerService {
     }
 
     private Distance calculateDistanceToBsAs(Double latitude, Double longitude) {
-        double distance = GeoUtil.distance(latitude, BS_AS_LAT, longitude, BS_AS_LONG, 0.0, 0.0);
+        double distance = IpTrackerUtil.distance(latitude, BS_AS_LAT, longitude, BS_AS_LONG, 0.0, 0.0);
         List<Double> latlng = List.of(latitude, longitude);
         return Distance.builder()
                 .kms(distance)

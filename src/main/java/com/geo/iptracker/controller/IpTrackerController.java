@@ -1,17 +1,20 @@
 package com.geo.iptracker.controller;
 
+import com.geo.iptracker.domain.dto.IpAddressRequest;
 import com.geo.iptracker.domain.dto.IpTrackerResponse;
 import com.geo.iptracker.service.IpTrackerService;
 import com.geo.iptracker.service.StatsService;
-import com.geo.iptracker.util.GeoUtil;
+import com.geo.iptracker.util.IpTrackerUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 @RestController
+@Slf4j
 public class IpTrackerController {
 
     private final IpTrackerService ipTrackerService;
@@ -23,30 +26,17 @@ public class IpTrackerController {
         this.statsService = statsService;
     }
 
-    @GetMapping("/resolveip/{ip}")
-    public Mono<ResponseEntity<IpTrackerResponse>> resolveIp(@PathVariable String ip) {
+    @PostMapping("/api/ipaddress")
+    public Mono<ResponseEntity<IpTrackerResponse>> resolveIp(@RequestBody IpAddressRequest request) {
 
-        if (!GeoUtil.isValidIP(ip)) {
+        if (!IpTrackerUtil.isValidIP(request.getIp())) {
+            log.info("Ip Address {} is invalid", request.getIp());
             return Mono.just(ResponseEntity.badRequest().build());
         }
-        return ipTrackerService.resolveIp(ip)
+        return ipTrackerService.resolveIp(request.getIp())
                 .flatMap(r -> statsService.collectStats(r))
                 .map(r -> ResponseEntity.ok(r));
 
     }
 
-    @GetMapping("/stats/max")
-    public Mono<ResponseEntity<String>> getCountryWithMaxDistance() {
-        return this.statsService.getCountryWithMaxDistance().map(c -> ResponseEntity.ok(c));
-    }
-
-    @GetMapping("/stats/min")
-    public Mono<ResponseEntity<String>> getCountryWithMinDistance() {
-        return this.statsService.getCountryWithMinDistance().map(c -> ResponseEntity.ok(c));
-    }
-
-    @GetMapping("/stats/average")
-    public Mono<ResponseEntity<Double>> getAverageDistance() {
-        return this.statsService.getAverageDistance().map(a -> ResponseEntity.ok(a));
-    }
 }

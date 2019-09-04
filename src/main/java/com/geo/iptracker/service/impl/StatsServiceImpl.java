@@ -1,7 +1,9 @@
-package com.geo.iptracker.service;
+package com.geo.iptracker.service.impl;
 
+import com.geo.iptracker.domain.dto.CountryDistance;
 import com.geo.iptracker.domain.dto.IpTrackerResponse;
 import com.geo.iptracker.repository.StatsRepository;
+import com.geo.iptracker.service.StatsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -30,13 +32,15 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
-    public Mono<String> getCountryWithMaxDistance() {
-        return statsRepository.getMaxDistance();
+    public Mono<CountryDistance> getCountryWithMaxDistance() {
+        return statsRepository.getMaxDistance().map(tuple ->
+                CountryDistance.builder().countryName(tuple.getValue()).distance(tuple.getScore()).build());
     }
 
     @Override
-    public Mono<String> getCountryWithMinDistance() {
-        return statsRepository.getMinDistance();
+    public Mono<CountryDistance> getCountryWithMinDistance() {
+        return statsRepository.getMinDistance().map(tuple ->
+                CountryDistance.builder().countryName(tuple.getValue()).distance(tuple.getScore()).build());
     }
 
     @Override

@@ -1,5 +1,7 @@
-package com.geo.iptracker.client.restcountries;
+package com.geo.iptracker.client.restcountries.impl;
 
+import com.geo.iptracker.client.restcountries.Country;
+import com.geo.iptracker.client.restcountries.RestCountriesClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ public class RestCountriesClientImpl implements RestCountriesClient {
 
         return this.webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/alpha/"+code)
+                        .query("fields=name;alpha2Code;alpha3Code;timezones;latlng;currencies;languages")
                         .build())
                 .retrieve()
                 .bodyToMono(Country.class);

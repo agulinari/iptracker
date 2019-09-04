@@ -1,9 +1,6 @@
 package com.geo.iptracker.controller;
 
-import com.geo.iptracker.domain.dto.Currency;
-import com.geo.iptracker.domain.dto.Distance;
-import com.geo.iptracker.domain.dto.IpTrackerResponse;
-import com.geo.iptracker.domain.dto.Language;
+import com.geo.iptracker.domain.dto.*;
 import com.geo.iptracker.service.IpTrackerService;
 import com.geo.iptracker.service.StatsService;
 import net.bytebuddy.asm.Advice;
@@ -14,6 +11,7 @@ import org.mockito.BDDMockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
@@ -69,15 +67,23 @@ public class IpTrackerControllerTests {
 
         BDDMockito.when(ipTrackerService.resolveIp(ip)).thenReturn(Mono.just(response));
         BDDMockito.when(statsService.collectStats(response)).thenReturn(Mono.just(response));
-        client.get().uri("/resolveip/"+ip)
+
+        IpAddressRequest request = new IpAddressRequest(ip);
+
+        client.post().uri("/api/ipaddress")
+                .body(BodyInserters.fromObject(request))
                 .exchange().expectStatus().isOk().expectBody(IpTrackerResponse.class)
                 .equals(response);
+
+        BDDMockito.verify(statsService, BDDMockito.times(1)).collectStats(response);
     }
 
     @Test
     public void invalidIp() {
         String ip = "12.r.2r.23";
-        client.get().uri("/resolveip/"+ip)
+        IpAddressRequest request = new IpAddressRequest(ip);
+        client.post().uri("/api/ipaddress")
+                .body(BodyInserters.fromObject(request))
                 .exchange().expectStatus().isBadRequest();
     }
 }

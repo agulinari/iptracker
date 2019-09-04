@@ -1,5 +1,7 @@
-package com.geo.iptracker.client.ip2country;
+package com.geo.iptracker.client.ip2country.impl;
 
+import com.geo.iptracker.client.ip2country.Ip2CountryClient;
+import com.geo.iptracker.client.ip2country.IpCountry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

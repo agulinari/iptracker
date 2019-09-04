@@ -1,4 +1,4 @@
-package com.geo.iptracker.client.restcountries;
+package com.geo.iptracker.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,13 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Currency {
+@Builder
+public class IpAddressRequest {
 
-    private String code;
-    private String name;
-    private String symbol;
+    private String ip;
 
 }

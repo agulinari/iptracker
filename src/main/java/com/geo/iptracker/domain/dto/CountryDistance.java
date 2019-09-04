@@ -1,4 +1,4 @@
-package com.geo.iptracker.client.restcountries;
+package com.geo.iptracker.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,12 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Language {
+@Builder
+public class CountryDistance {
 
-    private String iso639_1;
-    private String name;
+    private String countryName;
+    private Double distance;
 
 }
