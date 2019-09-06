@@ -5,20 +5,19 @@ import com.geo.iptracker.client.fixer.FixerClient;
 import com.geo.iptracker.client.ip2country.Ip2CountryClient;
 import com.geo.iptracker.client.restcountries.Country;
 import com.geo.iptracker.client.restcountries.RestCountriesClient;
-import com.geo.iptracker.domain.dto.Currency;
-import com.geo.iptracker.domain.dto.Distance;
-import com.geo.iptracker.domain.dto.IpTrackerResponse;
-import com.geo.iptracker.domain.dto.Language;
+import com.geo.iptracker.domain.dto.*;
 import com.geo.iptracker.service.IpTrackerService;
 import com.geo.iptracker.util.IpTrackerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.time.Instant;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +26,7 @@ public class IpTrackerServiceImpl implements IpTrackerService {
 
     private static double BS_AS_LAT = -34.61315;
     private static double BS_AS_LONG = -58.37723;
+    private static String USD_CODE = "USD";
 
     private final Ip2CountryClient ip2CountryClient;
     private final RestCountriesClient restCountriesClient;
@@ -54,7 +54,7 @@ public class IpTrackerServiceImpl implements IpTrackerService {
         Distance distanceToBsAs = calculateDistanceToBsAs(country.getLatlng().get(0), country.getLatlng().get(1));
         List<Currency> currencies = buildCurrency(country.getCurrencies(), exchangeRates);
         List<Language> languages = buildLanguages(country.getLanguages());
-        List<LocalDateTime> localTimes = calculateLocalTimes(country.getTimezones());
+        List<LocalHour> localTimes = calculateLocalTimes(country.getTimezones());
 
         return IpTrackerResponse.builder()
                 .ip(ip)
@@ -68,18 +68,21 @@ public class IpTrackerServiceImpl implements IpTrackerService {
         .build();
     }
 
-    private List<LocalDateTime> calculateLocalTimes(List<String> timezones) {
+    private List<LocalHour> calculateLocalTimes(List<String> timezones) {
         return timezones.stream().map(this::getDateTime).collect(Collectors.toList());
     }
 
-    private LocalDateTime getDateTime(String timezone) {
+    private LocalHour getDateTime(String timezone) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
         String prefix = timezone.substring(0,3);
         String offset = timezone.substring(3);
         if (!offset.isEmpty()) {
             ZoneOffset zoneOffset = ZoneOffset.of(offset);
-            return LocalDateTime.now(ZoneId.ofOffset(prefix, zoneOffset));
+            String hour = LocalDateTime.now(ZoneId.ofOffset(prefix, zoneOffset)).format(dtf);
+            return LocalHour.builder().hour(hour).timezone(timezone).build();
         } else {
-            return LocalDateTime.now(ZoneOffset.UTC);
+            String hour = LocalDateTime.now(ZoneOffset.UTC).format(dtf);
+            return LocalHour.builder().hour(hour).timezone(timezone).build();
         }
     }
 
@@ -96,12 +99,18 @@ public class IpTrackerServiceImpl implements IpTrackerService {
     }
 
     private Currency mapCurrency(com.geo.iptracker.client.restcountries.Currency c, ExchangeRates exchangeRates) {
-        Double rate = exchangeRates.getRates().get(c.getCode());
+        Double rateUsd = exchangeRates.getRates().get(USD_CODE);
+        Double rateBaseEur = exchangeRates.getRates().get(c.getCode());
+        Double rateBaseUsd = null;
+        if (rateBaseEur != null) {
+            double div = rateBaseEur.doubleValue() / rateUsd.doubleValue();
+            rateBaseUsd = BigDecimal.valueOf(div).setScale(2, RoundingMode.FLOOR).doubleValue();
+        }
         Currency currency = Currency.builder()
                 .code(c.getCode())
                 .name(c.getName())
                 .symbol(c.getSymbol())
-                .rate(rate)
+                .usdRate(rateBaseUsd)
                 .build();
         return currency;
     }
@@ -110,7 +119,7 @@ public class IpTrackerServiceImpl implements IpTrackerService {
         double distance = IpTrackerUtil.distance(latitude, BS_AS_LAT, longitude, BS_AS_LONG, 0.0, 0.0);
         List<Double> latlng = List.of(latitude, longitude);
         return Distance.builder()
-                .kms(distance)
+                .kms(BigDecimal.valueOf(distance).setScale(2, RoundingMode.FLOOR).doubleValue())
                 .latlng(latlng)
                 .build();
 

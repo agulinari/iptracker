@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
 import java.util.Map;
 
 @Service
@@ -54,11 +55,18 @@ public class StatsServiceImpl implements StatsService {
 
     private Double calculateAverage(Map<String, Double> mapCalls, Map<String, Double> mapDistances) {
         double average = 0.0;
-        double n = 1.0;
+        double n = 0.0;
+
+        // total calls
+        for (Double calls: mapCalls.values()) {
+            n = n + calls;
+        }
+
+        // average
         for (Map.Entry<String, Double> entryCall : mapCalls.entrySet()) {
+            Double calls = entryCall.getValue();
             Double distance = mapDistances.get(entryCall.getKey());
-            average =  average + ((distance.doubleValue() * entryCall.getValue()) - average) / n;
-            n = n + 1;
+            average =  average + (distance.doubleValue() * calls.doubleValue()) / n;
         }
         return average;
     }

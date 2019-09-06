@@ -73,18 +73,16 @@ public class StatsServiceTests {
     public void getAverageDistanceOk() {
 
         // Expected response
-        Double expected = 4856.066666666667;
+        int expected = 5254;
 
         // Mocks setup
-        ZSetOperations.TypedTuple<String> dis1 = new DefaultTypedTuple<>("Argentina", 500.0);
-        ZSetOperations.TypedTuple<String> dis2 = new DefaultTypedTuple<>("Brasil", 740.5);
-        ZSetOperations.TypedTuple<String> dis3 = new DefaultTypedTuple<>("Chile", 1540.8);
-        ZSetOperations.TypedTuple<String> call1 = new DefaultTypedTuple<>("Brasil", 10.0);
-        ZSetOperations.TypedTuple<String> call2 = new DefaultTypedTuple<>("Argentina", 2.0);
-        ZSetOperations.TypedTuple<String> call3 = new DefaultTypedTuple<>("Chile", 4.0);
+        ZSetOperations.TypedTuple<String> dis1 = new DefaultTypedTuple<>("Brasil", 2862.0);
+        ZSetOperations.TypedTuple<String> dis2 = new DefaultTypedTuple<>("España", 10040.0);
+        ZSetOperations.TypedTuple<String> call1 = new DefaultTypedTuple<>("España", 5.0);
+        ZSetOperations.TypedTuple<String> call2 = new DefaultTypedTuple<>("Brasil", 10.0);
 
-        Flux<ZSetOperations.TypedTuple<String>> fluxDistances = Flux.just(dis1, dis2, dis3);
-        Flux<ZSetOperations.TypedTuple<String>> fluxCalls = Flux.just(call1, call2, call3);
+        Flux<ZSetOperations.TypedTuple<String>> fluxDistances = Flux.just(dis1, dis2);
+        Flux<ZSetOperations.TypedTuple<String>> fluxCalls = Flux.just(call1, call2);
 
         BDDMockito.when(statsRepository.getDistances()).thenReturn(fluxDistances);
         BDDMockito.when(statsRepository.getCalls()).thenReturn(fluxCalls);
@@ -94,7 +92,7 @@ public class StatsServiceTests {
 
         // Verification
         StepVerifier.create(res)
-                .assertNext(r -> assertEquals(r, expected))
+                .assertNext(r -> assertEquals(r.intValue(), expected))
                 .verifyComplete();
 
     }

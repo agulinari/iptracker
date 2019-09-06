@@ -18,7 +18,7 @@ public class IpTrackerResponse {
     private LocalDateTime date;
     private String countryName;
     private String isoCode;
-    private List<LocalDateTime> localTimes;
+    private List<LocalHour> localTimes;
     private Distance distanceToBsAs;
     private List<Currency> currencies;
     private List<Language> languages;

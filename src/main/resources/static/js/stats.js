@@ -14,7 +14,6 @@
 })();
 
 (function pollmin() {
-    setTimeout(function() {
         $.ajax({
             url: "/api/stats/min",
             type: "GET",
@@ -24,25 +23,22 @@
                 $('#mindistance').html(json);
             },
             dataType: "json",
-            complete: pollmin,
+            complete: setTimeout(function() {pollmin()}, 5000),
             timeout: 2000
         })
-    }, 5000);
 })();
 
 (function pollavg() {
-    setTimeout(function() {
         $.ajax({
             url: "/api/stats/average",
             type: "GET",
             success: function(data) {
-                var json = "<h4>Average Distance</h4><pre>"
+                var json = "<h4>Average distance</h4><pre>"
                     + JSON.stringify(data, null, 4) + "</pre>";
                 $('#average').html(json);
             },
             dataType: "json",
-            complete: pollavg,
+            complete: setTimeout(function() {pollavg()}, 5000),
             timeout: 2000
         })
-    }, 5000);
 })()

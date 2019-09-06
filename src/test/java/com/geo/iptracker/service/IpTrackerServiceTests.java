@@ -6,10 +6,7 @@ import com.geo.iptracker.client.ip2country.Ip2CountryClient;
 import com.geo.iptracker.client.ip2country.IpCountry;
 import com.geo.iptracker.client.restcountries.Country;
 import com.geo.iptracker.client.restcountries.RestCountriesClient;
-import com.geo.iptracker.domain.dto.Currency;
-import com.geo.iptracker.domain.dto.Distance;
-import com.geo.iptracker.domain.dto.IpTrackerResponse;
-import com.geo.iptracker.domain.dto.Language;
+import com.geo.iptracker.domain.dto.*;
 import com.geo.iptracker.service.impl.IpTrackerServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,13 +49,13 @@ public class IpTrackerServiceTests {
 
         // Expected response
         Language lang = Language.builder().code("de").name("German").build();
-        Currency currency = Currency.builder().code("EUR").name("Euro").symbol("€").rate(1.0).build();
-        List<LocalDateTime> localTimes = List.of();
+        Currency currency = Currency.builder().code("EUR").name("Euro").symbol("€").usdRate(0.9).build();
+        List<LocalHour> localTimes = List.of();
         List<Language> languages = List.of(lang);
         List<Currency> currencies = List.of(currency);
 
         Distance distance = Distance.builder()
-                .kms(11566.193517623735)
+                .kms(11566.19)
                 .latlng(List.of(51.0, 9.0))
                 .build();
         IpTrackerResponse expected = IpTrackerResponse.builder()

@@ -45,8 +45,8 @@ public class IpTrackerControllerTests {
         String ip = "5.6.7.8";
 
         Language lang = Language.builder().code("de").name("German").build();
-        Currency currency = Currency.builder().code("EUR").name("Euro").symbol("€").rate(1.0).build();
-        List<LocalDateTime> localTimes = List.of();
+        Currency currency = Currency.builder().code("EUR").name("Euro").symbol("€").usdRate(1.0).build();
+        List<LocalHour> localTimes = List.of();
         List<Language> languages = List.of(lang);
         List<Currency> currencies = List.of(currency);
 

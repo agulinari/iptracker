@@ -6,14 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
-public class Currency {
+@NoArgsConstructor
+@AllArgsConstructor
+public class LocalHour {
 
-    private String code;
-    private String name;
-    private String symbol;
-    private Double usdRate;
+    private String hour;
+    private String timezone;
 
 }
