@@ -21,7 +21,7 @@ mvn clean package
 Correr el docker-compose
 
 ```
-docker-compose up
+docker-compose up --build
 ```
 
 Ingresar a la aplicación 
